@@ -13,7 +13,8 @@ export const todoSchema = z.object({
   created: z.string().datetime(),
 });
 
-export type Todo = z.infer<typeof todoSchema>;
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Todo extends z.infer<typeof todoSchema> {}
 
 export function createTodo(title: Todo["title"]): Todo {
   const parsed = todoSchema.shape.title.parse(title);
@@ -41,4 +42,13 @@ export function completeTodo(todo: Todo): Todo {
 export function reopenTodo(todo: Todo): Todo {
   if (todo.state === todoState.open) return todo;
   return { ...todo, state: todoState.open };
+}
+
+export function isTitleValid(title: string): boolean {
+  const result = todoSchema.shape.title.safeParse(title);
+  return result.success;
+}
+
+export function isTodoCompleted(todo: Todo): boolean {
+  return todo.state === todoState.done;
 }

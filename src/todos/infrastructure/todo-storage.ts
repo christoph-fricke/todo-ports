@@ -45,7 +45,6 @@ export function createTodoStorage(
 function loadTodos(storage: Storage, key: string): Todo[] {
   const items = storage.getItem(key);
   if (!items) return [];
-  console.log(items);
 
   try {
     return storageSchema.parse(JSON.parse(items));
