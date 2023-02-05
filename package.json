@@ -14,8 +14,12 @@
     "lint": "eslint . && prettier -c ."
   },
   "dependencies": {
+    "@xstate/inspect": "^0.7.1",
+    "@xstate/react": "^3.1.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "xstate": "^4.35.4",
+    "xsystem": "^0.5.0",
     "zod": "^3.20.2"
   },
   "devDependencies": {

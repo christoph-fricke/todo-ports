@@ -1,6 +1,6 @@
 {
   "root": true,
-  "ignorePatterns": ["dist", "coverage", "node_modules", "reports"],
+  "ignorePatterns": ["dist", "coverage", "node_modules", "reports", "**/*.typegen.ts"],
   "parser": "@typescript-eslint/parser",
   "extends": [
     "eslint:recommended",

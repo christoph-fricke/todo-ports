@@ -1,8 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { spawnBehavior } from "xstate";
 import { App } from "./app";
-import { createTodoUseCases } from "./todos/core/use-cases/todo-use-cases";
-import { createTodoStorage } from "./todos/infrastructure/todo-stroage";
+import { createSystemBus } from "./system/bus";
+import { createTodoUseCases, createTodoStorage } from "./todos";
 
 declare global {
   // Access to uses cases to control the app from the console.
@@ -10,22 +11,31 @@ declare global {
   var useCases: ReturnType<typeof connectPorts>;
 }
 
-(function main() {
+(async function main() {
+  await openInspector();
   const useCases = connectPorts();
-  const root = createRoot(document.getElementById("root")!);
+  const bus = spawnBehavior(createSystemBus(), { id: "SystemBus" });
 
   globalThis.useCases = useCases;
 
+  const root = createRoot(document.getElementById("root")!);
   root.render(
     <StrictMode>
-      <App />
+      <App eventBus={bus} todos={useCases.todos} />
     </StrictMode>
   );
 })();
 
+export async function openInspector() {
+  if (import.meta.env.PROD) return;
+
+  const { inspect } = await import("@xstate/inspect");
+  inspect({ iframe: false, url: "https://stately.ai/viz?inspect" });
+}
+
 function connectPorts() {
   const todoStorage = createTodoStorage(localStorage, "todo-save");
-  const todoUseCases = createTodoUseCases({ todoStorage });
+  const todos = createTodoUseCases({ todoStorage });
 
-  return { todoUseCases } as const;
+  return { todos } as const;
 }
