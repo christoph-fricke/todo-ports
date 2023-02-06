@@ -8,7 +8,7 @@ export const todoState = {
 
 export const todoSchema = z.object({
   id: z.string().uuid(),
-  title: z.string().max(128),
+  title: z.string().trim().min(1).max(128),
   state: z.nativeEnum(todoState),
   created: z.string().datetime(),
 });
