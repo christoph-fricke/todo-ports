@@ -54,6 +54,7 @@ export function createTodoManager(deps: TodoManagerDependencies) {
         },
         LoadingFailed: {},
         Viewing: {
+          tags: ["viewing"],
           initial: "Idle",
           on: { "todos.edit.toggle": "Editing" },
           states: {
@@ -84,6 +85,7 @@ export function createTodoManager(deps: TodoManagerDependencies) {
           },
         },
         Editing: {
+          tags: ["editing"],
           initial: "Idle",
           on: { "todos.edit.toggle": "Viewing" },
           states: {
@@ -105,7 +107,10 @@ export function createTodoManager(deps: TodoManagerDependencies) {
               invoke: {
                 src: "createTodo",
                 id: "createTodo",
-                onDone: { target: "Idle", actions: "appendTodo" },
+                onDone: {
+                  target: "Idle",
+                  actions: ["appendTodo", "resetNewTitle"],
+                },
                 onError: "Idle",
               },
             },
@@ -140,6 +145,7 @@ export function createTodoManager(deps: TodoManagerDependencies) {
       },
       actions: {
         setNewTitle: assign({ newTodoTitle: (ctx, e) => e.payload.title }),
+        resetNewTitle: assign({ newTodoTitle: (ctx, e) => "" }),
         setTodos: assign({ todos: (ctx, e) => e.data }),
         appendTodo: assign({ todos: (ctx, e) => ctx.todos.concat(e.data) }),
         saveTodo: assign({

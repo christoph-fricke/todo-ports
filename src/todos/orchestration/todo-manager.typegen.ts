@@ -38,6 +38,7 @@
         eventsCausingActions: {
           "appendTodo": "done.invoke.createTodo";
 "removeTodo": "done.invoke.deleteTodo";
+"resetNewTitle": "done.invoke.createTodo";
 "saveTodo": "done.invoke.completeTodo" | "done.invoke.reopenTodo" | "done.invoke.updateTodo";
 "setNewTitle": "todos.new-todo.change-title";
 "setTodos": "done.invoke.fetchTodos";
@@ -60,6 +61,6 @@
         };
         matchesStates: "Editing" | "Editing.CreatingTodo" | "Editing.DeletingTodo" | "Editing.Idle" | "Editing.UpdatingTodo" | "Init" | "LoadingFailed" | "Viewing" | "Viewing.CompletingTodo" | "Viewing.Idle" | "Viewing.ReopeningTodo" | { "Editing"?: "CreatingTodo" | "DeletingTodo" | "Idle" | "UpdatingTodo";
 "Viewing"?: "CompletingTodo" | "Idle" | "ReopeningTodo"; };
-        tags: never;
+        tags: "editing" | "viewing";
       }
   
