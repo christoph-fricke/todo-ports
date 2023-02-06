@@ -1,5 +1,5 @@
 import type { SystemBus } from "./system/bus";
-import { TodoInPort, useTodoManager } from "./todos";
+import { TodoInPort, TodoPage, useTodoManager } from "./todos";
 
 type AppProps = {
   eventBus: SystemBus;
@@ -7,12 +7,7 @@ type AppProps = {
 };
 
 export function App(props: AppProps): JSX.Element {
-  useTodoManager(props.eventBus, props.todos);
+  const todoManager = useTodoManager(props.eventBus, props.todos);
 
-
-  return (
-    <main>
-      <h1>Todos</h1>
-    </main>
-  );
+  return <TodoPage todoManager={todoManager} bus={props.eventBus} />;
 }

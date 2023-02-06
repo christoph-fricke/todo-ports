@@ -16,3 +16,5 @@ export {
   useTodoManager,
   useTodoManagerEvents,
 } from "./orchestration/use-todo-manager";
+
+export { TodoPage } from "./components/todo-page";
