@@ -8,7 +8,7 @@ import { createTodoUseCases, createTodoStorage } from "./todos";
 declare global {
   // Access to uses cases to control the app from the console.
   // eslint-disable-next-line no-var
-  var useCases: ReturnType<typeof connectPorts>;
+  var app: ReturnType<typeof connectPorts>;
 }
 
 (async function main() {
@@ -16,7 +16,7 @@ declare global {
   const useCases = connectPorts();
   const bus = spawnBehavior(createSystemBus(), { id: "SystemBus" });
 
-  globalThis.useCases = useCases;
+  globalThis.app = useCases;
 
   const root = createRoot(document.getElementById("root")!);
   root.render(
