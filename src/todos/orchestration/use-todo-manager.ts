@@ -1,19 +1,22 @@
 import { useInterpret } from "@xstate/react";
 import { useMemo } from "react";
-import type { SystemBus } from "../../system/bus";
 import type { TodoInPort } from "../core/in-ports";
-import { createTodoManager, TodoManagerActor } from "./todo-manager";
+import {
+  createTodoManager,
+  EventBusWithTodoEvents,
+  TodoManagerActor
+} from "./todo-manager";
 import {
   changeNewTodoTitle,
   createNewTodo,
   deleteTodo,
   toggleEditing,
   toggleTodo,
-  updateTodo,
+  updateTodo
 } from "./todo-manager.model";
 
 export function useTodoManager(
-  bus: SystemBus,
+  bus: EventBusWithTodoEvents,
   todos: TodoInPort
 ): TodoManagerActor {
   const actor = useInterpret(createTodoManager({ eventBus: bus, todos }), {
@@ -22,7 +25,7 @@ export function useTodoManager(
   return actor;
 }
 
-export function useTodoManagerEvents(actor: TodoManagerActor) {
+export function useTodoManagerEvents(actor: EventBusWithTodoEvents) {
   const events = useMemo(
     () => ({
       toggleEditing: toggleEditing.createSendCall(actor),

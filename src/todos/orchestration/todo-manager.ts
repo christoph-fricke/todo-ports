@@ -1,19 +1,19 @@
-import { ActorRefFrom, createMachine, StateFrom, t, assign } from "xstate";
+import { ActorRefFrom, assign, createMachine, StateFrom, t } from "xstate";
+import { EventBus, fromActor } from "xsystem";
+import { isTitleValid, isTodoCompleted, Todo } from "../core/domain/todo";
 import type { TodoInPort } from "../core/in-ports";
-import { Todo, isTitleValid, isTodoCompleted } from "../core/domain/todo";
-import type { SystemBus } from "../../system/bus";
 import {
   getInitialContext,
   TodoManagerEvent,
-  TodoMangerContext,
+  TodoMangerContext
 } from "./todo-manager.model";
-import { fromActor } from "xsystem";
 
+export type EventBusWithTodoEvents = EventBus<TodoManagerEvent>;
 export type TodoManagerActor = ActorRefFrom<typeof createTodoManager>;
 export type TodoManagerState = StateFrom<typeof createTodoManager>;
 
 export type TodoManagerDependencies = {
-  eventBus: SystemBus;
+  eventBus: EventBusWithTodoEvents;
   todos: TodoInPort;
 };
 
