@@ -19,6 +19,7 @@
 "error.platform.reopenTodo": { type: "error.platform.reopenTodo"; data: unknown };
 "error.platform.updateTodo": { type: "error.platform.updateTodo"; data: unknown };
 "xstate.init": { type: "xstate.init" };
+"xstate.stop": { type: "xstate.stop" };
         };
         invokeSrcNameMap: {
           "completeTodo": "done.invoke.completeTodo";
@@ -37,6 +38,7 @@
         };
         eventsCausingActions: {
           "appendTodo": "done.invoke.createTodo";
+"clearDeletionId": "done.invoke.deleteTodo" | "error.platform.deleteTodo" | "todos.edit.toggle" | "xstate.stop";
 "notifyTodoCreated": "done.invoke.createTodo";
 "notifyTodoUpdated": "done.invoke.updateTodo";
 "removeTodo": "done.invoke.deleteTodo";
@@ -44,6 +46,7 @@
 "saveTodo": "done.invoke.completeTodo" | "done.invoke.reopenTodo" | "done.invoke.updateTodo";
 "setNewTitle": "todos.new-todo.change-title";
 "setTodos": "done.invoke.fetchTodos";
+"storeDeletionId": "todos.todo.delete";
         };
         eventsCausingDelays: {
           
@@ -55,14 +58,14 @@
         eventsCausingServices: {
           "completeTodo": "todos.todo.toggle";
 "createTodo": "todos.new-todo.create";
-"deleteTodo": "todos.todo.delete";
+"deleteTodo": "todos.todo.delete.confirm";
 "eventBusListener": "xstate.init";
 "fetchTodos": "xstate.init";
 "reopenTodo": "todos.todo.toggle";
 "updateTodo": "todos.todo.update";
         };
-        matchesStates: "Editing" | "Editing.CreatingTodo" | "Editing.DeletingTodo" | "Editing.Idle" | "Editing.UpdatingTodo" | "Init" | "LoadingFailed" | "Viewing" | "Viewing.CompletingTodo" | "Viewing.Idle" | "Viewing.ReopeningTodo" | { "Editing"?: "CreatingTodo" | "DeletingTodo" | "Idle" | "UpdatingTodo";
+        matchesStates: "Editing" | "Editing.ConfirmingDeletion" | "Editing.CreatingTodo" | "Editing.DeletingTodo" | "Editing.Idle" | "Editing.UpdatingTodo" | "Init" | "LoadingFailed" | "Viewing" | "Viewing.CompletingTodo" | "Viewing.Idle" | "Viewing.ReopeningTodo" | { "Editing"?: "ConfirmingDeletion" | "CreatingTodo" | "DeletingTodo" | "Idle" | "UpdatingTodo";
 "Viewing"?: "CompletingTodo" | "Idle" | "ReopeningTodo"; };
-        tags: "editing" | "viewing";
+        tags: "deletion-dialog" | "editing" | "viewing";
       }
   

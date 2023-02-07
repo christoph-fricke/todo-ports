@@ -109,7 +109,7 @@ export function createTodoManager(deps: TodoManagerDependencies) {
                   target: "CreatingTodo",
                   cond: "isTitleValid",
                 },
-                "todos.todo.delete": "DeletingTodo",
+                "todos.todo.delete": "ConfirmingDeletion",
                 "todos.todo.update": "UpdatingTodo",
               },
             },
@@ -124,7 +124,16 @@ export function createTodoManager(deps: TodoManagerDependencies) {
                 onError: "Idle",
               },
             },
+            ConfirmingDeletion: {
+              tags: "deletion-dialog",
+              entry: "storeDeletionId",
+              on: {
+                "todos.todo.delete.cancel": "Idle",
+                "todos.todo.delete.confirm": "DeletingTodo",
+              },
+            },
             DeletingTodo: {
+              exit: "clearDeletionId",
               invoke: {
                 src: "deleteTodo",
                 id: "deleteTodo",
@@ -136,7 +145,10 @@ export function createTodoManager(deps: TodoManagerDependencies) {
               invoke: {
                 src: "updateTodo",
                 id: "updateTodo",
-                onDone: { target: "Idle", actions: ["saveTodo", "notifyTodoUpdated"] },
+                onDone: {
+                  target: "Idle",
+                  actions: ["saveTodo", "notifyTodoUpdated"],
+                },
                 onError: "Idle",
               },
             },
@@ -156,6 +168,8 @@ export function createTodoManager(deps: TodoManagerDependencies) {
       actions: {
         setNewTitle: assign({ newTodoTitle: (ctx, e) => e.payload.title }),
         resetNewTitle: assign({ newTodoTitle: (ctx, e) => "" }),
+        storeDeletionId: assign({ deletionId: (ctx, e) => e.payload.id }),
+        clearDeletionId: assign({ deletionId: (ctx, e) => null }),
         setTodos: assign({ todos: (ctx, e) => e.data }),
         appendTodo: assign({ todos: (ctx, e) => ctx.todos.concat(e.data) }),
         saveTodo: assign({
@@ -180,9 +194,13 @@ export function createTodoManager(deps: TodoManagerDependencies) {
           deps.todos.editTodo(e.payload.id, e.payload.title),
         completeTodo: (ctx, e) => deps.todos.completeTodo(e.payload.id),
         reopenTodo: (ctx, e) => deps.todos.reopenTodo(e.payload.id),
-        deleteTodo: async (ctx, e) => {
-          await deps.todos.removeTodo(e.payload.id);
-          return e.payload.id;
+        deleteTodo: async (ctx) => {
+          if (!ctx.deletionId) {
+            throw new Error("Called without an deletion Id.");
+          }
+
+          await deps.todos.removeTodo(ctx.deletionId);
+          return ctx.deletionId;
         },
       },
     }

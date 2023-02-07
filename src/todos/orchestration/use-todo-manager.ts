@@ -4,15 +4,17 @@ import type { TodoInPort } from "../core/in-ports";
 import {
   createTodoManager,
   EventBusWithTodoEvents,
-  TodoManagerActor
+  TodoManagerActor,
 } from "./todo-manager";
 import {
+  cancelDelete,
   changeNewTodoTitle,
+  confirmDelete,
   createNewTodo,
   deleteTodo,
   toggleEditing,
   toggleTodo,
-  updateTodo
+  updateTodo,
 } from "./todo-manager.model";
 
 export function useTodoManager(
@@ -34,6 +36,8 @@ export function useTodoManagerEvents(actor: EventBusWithTodoEvents) {
       toggleTodo: toggleTodo.createSendCall(actor),
       updateTodo: updateTodo.createSendCall(actor),
       deleteTodo: deleteTodo.createSendCall(actor),
+      cancelDelete: cancelDelete.createSendCall(actor),
+      confirmDelete: confirmDelete.createSendCall(actor),
     }),
     [actor]
   );

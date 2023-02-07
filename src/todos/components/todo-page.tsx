@@ -1,17 +1,17 @@
 import { FormEventHandler, useId } from "react";
 import { useSelector } from "@xstate/react";
-import type { EventBus } from "xsystem";
-import type { TodoManagerActor } from "../orchestration/todo-manager";
-import {
-  createNewTodo,
-  TodoManagerEvent,
-} from "../orchestration/todo-manager.model";
+import type {
+  EventBusWithTodoEvents,
+  TodoManagerActor,
+} from "../orchestration/todo-manager";
+import { createNewTodo } from "../orchestration/todo-manager.model";
 import { useTodoManagerEvents } from "../orchestration/use-todo-manager";
 import { EditingTodo, ViewingTodo } from "./todo";
+import { ConfirmDeletionDialog } from "./confirm-dialog";
 
 type TodoPageProps = {
   todoManager: TodoManagerActor;
-  bus: EventBus<TodoManagerEvent>;
+  bus: EventBusWithTodoEvents;
 };
 
 export function TodoPage(props: TodoPageProps): JSX.Element {
@@ -28,9 +28,17 @@ export function TodoPage(props: TodoPageProps): JSX.Element {
   const canAddTodo = useSelector(props.todoManager, (state) =>
     state.can(createNewTodo)
   );
+  const showDeleteDialog = useSelector(props.todoManager, (state) =>
+    state.hasTag("deletion-dialog")
+  );
 
   return (
     <main>
+      <ConfirmDeletionDialog
+        open={showDeleteDialog}
+        onCancel={events.cancelDelete}
+        onConfirm={events.confirmDelete}
+      />
       <div
         style={{
           display: "flex",
