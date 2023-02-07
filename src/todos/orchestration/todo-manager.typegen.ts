@@ -37,6 +37,8 @@
         };
         eventsCausingActions: {
           "appendTodo": "done.invoke.createTodo";
+"notifyTodoCreated": "done.invoke.createTodo";
+"notifyTodoUpdated": "done.invoke.updateTodo";
 "removeTodo": "done.invoke.deleteTodo";
 "resetNewTitle": "done.invoke.createTodo";
 "saveTodo": "done.invoke.completeTodo" | "done.invoke.reopenTodo" | "done.invoke.updateTodo";

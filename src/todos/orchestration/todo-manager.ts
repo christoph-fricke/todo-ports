@@ -1,14 +1,24 @@
-import { ActorRefFrom, assign, createMachine, StateFrom, t } from "xstate";
+import {
+  ActorRefFrom,
+  assign,
+  createMachine,
+  send,
+  StateFrom,
+  t,
+} from "xstate";
 import { EventBus, fromActor } from "xsystem";
+import { NotificationEvent, notifyUserEvent } from "../../notifications";
 import { isTitleValid, isTodoCompleted, Todo } from "../core/domain/todo";
 import type { TodoInPort } from "../core/in-ports";
 import {
   getInitialContext,
   TodoManagerEvent,
-  TodoMangerContext
+  TodoMangerContext,
 } from "./todo-manager.model";
 
-export type EventBusWithTodoEvents = EventBus<TodoManagerEvent>;
+export type EventBusWithTodoEvents = EventBus<
+  TodoManagerEvent | NotificationEvent
+>;
 export type TodoManagerActor = ActorRefFrom<typeof createTodoManager>;
 export type TodoManagerState = StateFrom<typeof createTodoManager>;
 
@@ -109,7 +119,7 @@ export function createTodoManager(deps: TodoManagerDependencies) {
                 id: "createTodo",
                 onDone: {
                   target: "Idle",
-                  actions: ["appendTodo", "resetNewTitle"],
+                  actions: ["appendTodo", "resetNewTitle", "notifyTodoCreated"],
                 },
                 onError: "Idle",
               },
@@ -126,7 +136,7 @@ export function createTodoManager(deps: TodoManagerDependencies) {
               invoke: {
                 src: "updateTodo",
                 id: "updateTodo",
-                onDone: { target: "Idle", actions: "saveTodo" },
+                onDone: { target: "Idle", actions: ["saveTodo", "notifyTodoUpdated"] },
                 onError: "Idle",
               },
             },
@@ -154,6 +164,12 @@ export function createTodoManager(deps: TodoManagerDependencies) {
         }),
         removeTodo: assign({
           todos: (ctx, e) => ctx.todos.filter((t) => t.id !== e.data),
+        }),
+        notifyTodoCreated: send(notifyUserEvent("success", "Todo Created."), {
+          to: deps.eventBus,
+        }),
+        notifyTodoUpdated: send(notifyUserEvent("success", "Todo Updated."), {
+          to: deps.eventBus,
         }),
       },
       services: {
