@@ -166,11 +166,11 @@ export function createTodoManager(deps: TodoManagerDependencies) {
         isTitleValid: (ctx) => isTitleValid(ctx.newTodoTitle),
       },
       actions: {
-        setNewTitle: assign({ newTodoTitle: (ctx, e) => e.payload.title }),
-        resetNewTitle: assign({ newTodoTitle: (ctx, e) => "" }),
-        storeDeletionId: assign({ deletionId: (ctx, e) => e.payload.id }),
-        clearDeletionId: assign({ deletionId: (ctx, e) => null }),
-        setTodos: assign({ todos: (ctx, e) => e.data }),
+        setNewTitle: assign({ newTodoTitle: (_, e) => e.payload.title }),
+        resetNewTitle: assign({ newTodoTitle: "" }),
+        storeDeletionId: assign({ deletionId: (_, e) => e.payload.id }),
+        clearDeletionId: assign({ deletionId: null }),
+        setTodos: assign({ todos: (_, e) => e.data }),
         appendTodo: assign({ todos: (ctx, e) => ctx.todos.concat(e.data) }),
         saveTodo: assign({
           todos: (ctx, e) =>
@@ -190,10 +190,10 @@ export function createTodoManager(deps: TodoManagerDependencies) {
         eventBusListener: fromActor(deps.eventBus, ["todos.*"]),
         fetchTodos: () => deps.todos.fetchAllTodos(),
         createTodo: (ctx) => deps.todos.addTodo(ctx.newTodoTitle),
-        updateTodo: (ctx, e) =>
+        updateTodo: (_, e) =>
           deps.todos.editTodo(e.payload.id, e.payload.title),
-        completeTodo: (ctx, e) => deps.todos.completeTodo(e.payload.id),
-        reopenTodo: (ctx, e) => deps.todos.reopenTodo(e.payload.id),
+        completeTodo: (_, e) => deps.todos.completeTodo(e.payload.id),
+        reopenTodo: (_, e) => deps.todos.reopenTodo(e.payload.id),
         deleteTodo: async (ctx) => {
           if (!ctx.deletionId) {
             throw new Error("Called without an deletion Id.");
