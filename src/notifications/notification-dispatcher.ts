@@ -21,7 +21,6 @@ export function createNotificationDispatcher(
 
         if (!window.Notification || Notification.permission === "denied") {
           alert(`${event.payload.type}: ${event.payload.message}`);
-          console.log('Called')
           return state;
         }
 
