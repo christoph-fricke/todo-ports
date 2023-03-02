@@ -1,5 +1,5 @@
 import { useSpawn } from "@xstate/react";
-import { ConfirmationDialog } from "./dialogs/confirmation-dialog";
+import { ConfirmationDialog } from "./dialogs/confirmation";
 import { createNotificationDispatcher } from "./notifications";
 import type { SystemBus } from "./system/bus";
 import { TodoInPort, TodoPage, useTodoManager } from "./todos";
