@@ -6,6 +6,8 @@ export type { TodoStorageOutPort } from "./core/out-ports";
 
 export { createTodoUseCases } from "./core/use-cases/todo-use-cases";
 export { createTodoStorage } from "./infrastructure/todo-storage";
+export { createConfirmation } from "./infrastructure/confirmation";
+export { createNotification } from "./infrastructure/notification";
 
 export type { TodoManagerEvent } from "./orchestration/todo-manager.model";
 export type {

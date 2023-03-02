@@ -3,14 +3,12 @@ import type { Todo } from "../core/domain/todo";
 
 export type TodoMangerContext = {
   todos: Todo[];
-  deletionId: Todo["id"] | null;
   newTodoTitle: string;
 };
 
 export function getInitialContext(): TodoMangerContext {
   return {
     todos: [],
-    deletionId: null,
     newTodoTitle: "",
   };
 }
@@ -19,8 +17,6 @@ export type TodoManagerEvent =
   | EventFrom<typeof toggleEditing>
   | EventFrom<typeof toggleTodo>
   | EventFrom<typeof deleteTodo>
-  | EventFrom<typeof cancelDelete>
-  | EventFrom<typeof confirmDelete>
   | EventFrom<typeof updateTodo>
   | EventFrom<typeof changeNewTodoTitle>
   | EventFrom<typeof createNewTodo>;
@@ -40,8 +36,6 @@ export const deleteTodo = createEvent(
     payload: { id },
   })
 );
-export const cancelDelete = createEvent("todos.todo.delete.cancel");
-export const confirmDelete = createEvent("todos.todo.delete.confirm");
 
 export const updateTodo = createEvent(
   "todos.todo.update",

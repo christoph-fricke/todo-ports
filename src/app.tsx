@@ -1,4 +1,5 @@
 import { useSpawn } from "@xstate/react";
+import { ConfirmationDialog } from "./dialogs/confirmation-dialog";
 import { createNotificationDispatcher } from "./notifications";
 import type { SystemBus } from "./system/bus";
 import { TodoInPort, TodoPage, useTodoManager } from "./todos";
@@ -12,5 +13,10 @@ export function App(props: AppProps): JSX.Element {
   useSpawn(createNotificationDispatcher(props.eventBus));
   const todoManager = useTodoManager(props.eventBus, props.todos);
 
-  return <TodoPage todoManager={todoManager} bus={props.eventBus} />;
+  return (
+    <>
+      <ConfirmationDialog bus={props.eventBus} />
+      <TodoPage todoManager={todoManager} bus={props.eventBus} />
+    </>
+  );
 }

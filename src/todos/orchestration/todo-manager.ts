@@ -1,13 +1,5 @@
-import {
-  ActorRefFrom,
-  assign,
-  createMachine,
-  send,
-  StateFrom,
-  t,
-} from "xstate";
+import { ActorRefFrom, assign, createMachine, StateFrom, t } from "xstate";
 import { EventBus, fromActor } from "xsystem";
-import { NotificationEvent, notifyUserEvent } from "../../notifications";
 import { isTitleValid, isTodoCompleted, Todo } from "../core/domain/todo";
 import type { TodoInPort } from "../core/in-ports";
 import {
@@ -16,9 +8,7 @@ import {
   TodoMangerContext,
 } from "./todo-manager.model";
 
-export type EventBusWithTodoEvents = EventBus<
-  TodoManagerEvent | NotificationEvent
->;
+export type EventBusWithTodoEvents = EventBus<TodoManagerEvent>;
 export type TodoManagerActor = ActorRefFrom<typeof createTodoManager>;
 export type TodoManagerState = StateFrom<typeof createTodoManager>;
 
@@ -109,7 +99,7 @@ export function createTodoManager(deps: TodoManagerDependencies) {
                   target: "CreatingTodo",
                   cond: "isTitleValid",
                 },
-                "todos.todo.delete": "ConfirmingDeletion",
+                "todos.todo.delete": "DeletingTodo",
                 "todos.todo.update": "UpdatingTodo",
               },
             },
@@ -119,21 +109,12 @@ export function createTodoManager(deps: TodoManagerDependencies) {
                 id: "createTodo",
                 onDone: {
                   target: "Idle",
-                  actions: ["appendTodo", "resetNewTitle", "notifyTodoCreated"],
+                  actions: ["appendTodo", "resetNewTitle"],
                 },
                 onError: "Idle",
               },
             },
-            ConfirmingDeletion: {
-              tags: "deletion-dialog",
-              entry: "storeDeletionId",
-              on: {
-                "todos.todo.delete.cancel": "Idle",
-                "todos.todo.delete.confirm": "DeletingTodo",
-              },
-            },
             DeletingTodo: {
-              exit: "clearDeletionId",
               invoke: {
                 src: "deleteTodo",
                 id: "deleteTodo",
@@ -147,7 +128,7 @@ export function createTodoManager(deps: TodoManagerDependencies) {
                 id: "updateTodo",
                 onDone: {
                   target: "Idle",
-                  actions: ["saveTodo", "notifyTodoUpdated"],
+                  actions: "saveTodo",
                 },
                 onError: "Idle",
               },
@@ -168,8 +149,6 @@ export function createTodoManager(deps: TodoManagerDependencies) {
       actions: {
         setNewTitle: assign({ newTodoTitle: (_, e) => e.payload.title }),
         resetNewTitle: assign({ newTodoTitle: "" }),
-        storeDeletionId: assign({ deletionId: (_, e) => e.payload.id }),
-        clearDeletionId: assign({ deletionId: null }),
         setTodos: assign({ todos: (_, e) => e.data }),
         appendTodo: assign({ todos: (ctx, e) => ctx.todos.concat(e.data) }),
         saveTodo: assign({
@@ -178,12 +157,6 @@ export function createTodoManager(deps: TodoManagerDependencies) {
         }),
         removeTodo: assign({
           todos: (ctx, e) => ctx.todos.filter((t) => t.id !== e.data),
-        }),
-        notifyTodoCreated: send(notifyUserEvent("success", "Todo Created."), {
-          to: deps.eventBus,
-        }),
-        notifyTodoUpdated: send(notifyUserEvent("success", "Todo Updated."), {
-          to: deps.eventBus,
         }),
       },
       services: {
@@ -194,13 +167,9 @@ export function createTodoManager(deps: TodoManagerDependencies) {
           deps.todos.editTodo(e.payload.id, e.payload.title),
         completeTodo: (_, e) => deps.todos.completeTodo(e.payload.id),
         reopenTodo: (_, e) => deps.todos.reopenTodo(e.payload.id),
-        deleteTodo: async (ctx) => {
-          if (!ctx.deletionId) {
-            throw new Error("Called without an deletion Id.");
-          }
-
-          await deps.todos.removeTodo(ctx.deletionId);
-          return ctx.deletionId;
+        deleteTodo: async (_, e) => {
+          await deps.todos.removeTodo(e.payload.id);
+          return e.payload.id;
         },
       },
     }

@@ -7,7 +7,6 @@ import type {
 import { createNewTodo } from "../orchestration/todo-manager.model";
 import { useTodoManagerEvents } from "../orchestration/use-todo-manager";
 import { EditingTodo, ViewingTodo } from "./todo";
-import { ConfirmDeletionDialog } from "./confirm-dialog";
 
 type TodoPageProps = {
   todoManager: TodoManagerActor;
@@ -28,17 +27,9 @@ export function TodoPage(props: TodoPageProps): JSX.Element {
   const canAddTodo = useSelector(props.todoManager, (state) =>
     state.can(createNewTodo)
   );
-  const showDeleteDialog = useSelector(props.todoManager, (state) =>
-    state.hasTag("deletion-dialog")
-  );
 
   return (
     <main>
-      <ConfirmDeletionDialog
-        open={showDeleteDialog}
-        onCancel={events.cancelDelete}
-        onConfirm={events.confirmDelete}
-      />
       <div
         style={{
           display: "flex",

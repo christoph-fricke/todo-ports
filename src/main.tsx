@@ -2,8 +2,13 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { spawnBehavior } from "xstate";
 import { App } from "./app";
-import { createSystemBus } from "./system/bus";
-import { createTodoUseCases, createTodoStorage } from "./todos";
+import { createSystemBus, SystemBus } from "./system/bus";
+import {
+  createTodoUseCases,
+  createTodoStorage,
+  createConfirmation,
+  createNotification,
+} from "./todos";
 
 declare global {
   // Access to uses cases to control the app from the console.
@@ -13,8 +18,8 @@ declare global {
 
 (async function main() {
   await openInspector();
-  const useCases = connectPorts();
   const bus = spawnBehavior(createSystemBus(), { id: "SystemBus" });
+  const useCases = connectPorts(bus);
 
   globalThis.app = useCases;
 
@@ -33,9 +38,15 @@ export async function openInspector() {
   inspect({ iframe: false, url: "https://stately.ai/viz?inspect" });
 }
 
-function connectPorts() {
+function connectPorts(bus: SystemBus) {
   const todoStorage = createTodoStorage(localStorage, "todo-save");
-  const todos = createTodoUseCases({ todoStorage });
+  const confirmations = createConfirmation(bus);
+  const notification = createNotification(bus);
+  const todos = createTodoUseCases({
+    todoStorage,
+    confirmations,
+    notification,
+  });
 
   return { todos } as const;
 }

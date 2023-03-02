@@ -11,3 +11,15 @@ export type TodoStorageOutPort = {
 
   deleteTodo(id: Todo["id"]): Promise<void>;
 };
+
+export type ConfirmationOutPort = {
+  requestTodoDeletionConfirmation(
+    todo: Todo
+  ): Promise<{ result: "confirmed" | "canceled" }>;
+};
+
+export type NotificationOutPort = {
+  notifyTodoCreation(created: Todo): Promise<void>;
+
+  notifyTodoUpdate(updated: Todo): Promise<void>;
+};

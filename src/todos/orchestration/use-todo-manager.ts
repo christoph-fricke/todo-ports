@@ -7,9 +7,7 @@ import {
   TodoManagerActor,
 } from "./todo-manager";
 import {
-  cancelDelete,
   changeNewTodoTitle,
-  confirmDelete,
   createNewTodo,
   deleteTodo,
   toggleEditing,
@@ -36,8 +34,6 @@ export function useTodoManagerEvents(actor: EventBusWithTodoEvents) {
       toggleTodo: toggleTodo.createSendCall(actor),
       updateTodo: updateTodo.createSendCall(actor),
       deleteTodo: deleteTodo.createSendCall(actor),
-      cancelDelete: cancelDelete.createSendCall(actor),
-      confirmDelete: confirmDelete.createSendCall(actor),
     }),
     [actor]
   );
