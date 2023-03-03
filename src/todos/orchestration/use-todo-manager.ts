@@ -1,4 +1,4 @@
-import { useInterpret } from "@xstate/react";
+import { useInterpret, useSelector } from "@xstate/react";
 import { useMemo } from "react";
 import type { TodoInPort } from "../core/in-ports";
 import {
@@ -39,4 +39,13 @@ export function useTodoManagerEvents(actor: EventBusWithTodoEvents) {
   );
 
   return events;
+}
+
+export function useTodoManagerState(actor: TodoManagerActor) {
+  const todos = useSelector(actor, (state) => state.context.todos);
+  const newTitle = useSelector(actor, (state) => state.context.newTodoTitle);
+  const isEditMode = useSelector(actor, (state) => state.hasTag("editing"));
+  const canAddTodo = useSelector(actor, (state) => state.can(createNewTodo));
+
+  return { todos, newTitle, isEditMode, canAddTodo } as const;
 }
