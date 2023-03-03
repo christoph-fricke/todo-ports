@@ -21,9 +21,12 @@ export function useTodoManager(
   bus: EventBusWithTodoEvents,
   todos: TodoInPort
 ): TodoManagerActor {
-  const actor = useInterpret(createTodoManager({ eventBus: bus, todos }), {
-    devTools: import.meta.env.DEV,
-  });
+  const actor = useInterpret(
+    () => createTodoManager({ eventBus: bus, todos }),
+    {
+      devTools: import.meta.env.DEV,
+    }
+  );
   return actor;
 }
 
