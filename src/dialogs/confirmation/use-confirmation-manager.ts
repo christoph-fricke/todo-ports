@@ -1,12 +1,21 @@
 import { useInterpret, useSelector } from "@xstate/react";
 import { useMemo } from "react";
-import { createConfirmationManager, EventBusWithConfirmationEvents } from "./confirmation-manager";
-import { cancelConfirmation, confirmConfirmation } from "./confirmation-manager.model";
+import {
+  createConfirmationManager,
+  EventBusWithConfirmationEvents,
+} from "./confirmation-manager";
+import {
+  cancelConfirmation,
+  confirmConfirmation,
+} from "./confirmation-manager.model";
 
 export function useConfirmationManager(bus: EventBusWithConfirmationEvents) {
-  const actor = useInterpret(createConfirmationManager({ eventBus: bus }), {
-    devTools: import.meta.env.DEV,
-  });
+  const actor = useInterpret(
+    () => createConfirmationManager({ eventBus: bus }),
+    {
+      devTools: import.meta.env.DEV,
+    }
+  );
 
   const events = useMemo(
     () => ({
