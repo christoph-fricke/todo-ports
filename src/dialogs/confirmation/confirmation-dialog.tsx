@@ -1,7 +1,6 @@
 import { useInterpret, useSelector } from "@xstate/react";
 import { ReactEventHandler, useEffect, useMemo, useRef } from "react";
 import {
-  ConfirmationManagerDependencies,
   createConfirmationManager,
   EventBusWithConfirmationEvents,
 } from "./confirmation-manager";
@@ -10,17 +9,17 @@ import {
   confirmConfirmation,
 } from "./confirmation-manager.model";
 
-function useConfirmationManager(deps: ConfirmationManagerDependencies) {
-  const actor = useInterpret(createConfirmationManager(deps), {
+function useConfirmationManager(bus: EventBusWithConfirmationEvents) {
+  const actor = useInterpret(createConfirmationManager({ eventBus: bus }), {
     devTools: import.meta.env.DEV,
   });
 
   const events = useMemo(
     () => ({
-      cancelConfirmation: cancelConfirmation.createSendCall(actor),
-      confirmConfirmation: confirmConfirmation.createSendCall(actor),
+      cancelConfirmation: cancelConfirmation.createSendCall(bus),
+      confirmConfirmation: confirmConfirmation.createSendCall(bus),
     }),
-    [actor]
+    [bus]
   );
 
   const state = useSelector(actor, (state) => ({
@@ -40,7 +39,7 @@ export function ConfirmationDialog(
   props: ConfirmationDialogProps
 ): JSX.Element {
   const dialog = useRef<HTMLDialogElement | null>(null);
-  const [state, events] = useConfirmationManager({ eventBus: props.bus });
+  const [state, events] = useConfirmationManager(props.bus);
 
   useEffect(() => {
     if (!dialog.current || !state.open) return;
