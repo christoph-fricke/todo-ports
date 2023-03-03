@@ -1,35 +1,6 @@
-import { useInterpret, useSelector } from "@xstate/react";
-import { ReactEventHandler, useEffect, useMemo, useRef } from "react";
-import {
-  createConfirmationManager,
-  EventBusWithConfirmationEvents,
-} from "./confirmation-manager";
-import {
-  cancelConfirmation,
-  confirmConfirmation,
-} from "./confirmation-manager.model";
-
-function useConfirmationManager(bus: EventBusWithConfirmationEvents) {
-  const actor = useInterpret(createConfirmationManager({ eventBus: bus }), {
-    devTools: import.meta.env.DEV,
-  });
-
-  const events = useMemo(
-    () => ({
-      cancelConfirmation: cancelConfirmation.createSendCall(bus),
-      confirmConfirmation: confirmConfirmation.createSendCall(bus),
-    }),
-    [bus]
-  );
-
-  const state = useSelector(actor, (state) => ({
-    open: state.hasTag("visible"),
-    title: state.context.request.title,
-    message: state.context.request.message,
-  }));
-
-  return [state, events] as const;
-}
+import { ReactEventHandler, useEffect, useRef } from "react";
+import type { EventBusWithConfirmationEvents } from "./confirmation-manager";
+import { useConfirmationManager } from "./use-confirmation-manager";
 
 type ConfirmationDialogProps = {
   bus: EventBusWithConfirmationEvents;
