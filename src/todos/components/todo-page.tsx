@@ -1,11 +1,9 @@
 import { FormEventHandler, useId } from "react";
-import { useSelector } from "@xstate/react";
 import type {
   EventBusWithTodoEvents,
   TodoManagerActor,
 } from "../orchestration/todo-manager";
-import { createNewTodo } from "../orchestration/todo-manager.model";
-import { useTodoManagerEvents } from "../orchestration/use-todo-manager";
+import { useTodoManagerEvents, useTodoManagerState } from "../orchestration/use-todo-manager";
 import { EditingTodo, ViewingTodo } from "./todo";
 import { ConfirmDeletionDialog } from "./confirm-dialog";
 
@@ -15,27 +13,13 @@ type TodoPageProps = {
 };
 
 export function TodoPage(props: TodoPageProps): JSX.Element {
+  const state = useTodoManagerState(props.todoManager);
   const events = useTodoManagerEvents(props.bus);
-
-  const todos = useSelector(props.todoManager, (state) => state.context.todos);
-  const newTitle = useSelector(
-    props.todoManager,
-    (state) => state.context.newTodoTitle
-  );
-  const isEditMode = useSelector(props.todoManager, (state) =>
-    state.hasTag("editing")
-  );
-  const canAddTodo = useSelector(props.todoManager, (state) =>
-    state.can(createNewTodo)
-  );
-  const showDeleteDialog = useSelector(props.todoManager, (state) =>
-    state.hasTag("deletion-dialog")
-  );
 
   return (
     <main>
       <ConfirmDeletionDialog
-        open={showDeleteDialog}
+        open={state.showDeleteDialog}
         onCancel={events.cancelDelete}
         onConfirm={events.confirmDelete}
       />
@@ -48,13 +32,13 @@ export function TodoPage(props: TodoPageProps): JSX.Element {
       >
         <h1>Todos</h1>
         <button onClick={events.toggleEditing}>
-          {isEditMode ? "Finish" : "Edit"}
+          {state.isEditMode ? "Finish" : "Edit"}
         </button>
       </div>
       <ul>
-        {todos.map((todo) => (
+        {state.todos.map((todo) => (
           <li key={todo.id}>
-            {isEditMode ? (
+            {state.isEditMode ? (
               <EditingTodo
                 id={todo.id}
                 title={todo.title}
@@ -73,10 +57,10 @@ export function TodoPage(props: TodoPageProps): JSX.Element {
           </li>
         ))}
       </ul>
-      {isEditMode && (
+      {state.isEditMode && (
         <NewTodoForm
-          newTodoTitle={newTitle}
-          canSubmit={canAddTodo}
+          newTodoTitle={state.newTitle}
+          canSubmit={state.canAddTodo}
           onTitleChange={events.changeNewTodoTitle}
           onSubmit={events.createNewTodo}
         />
